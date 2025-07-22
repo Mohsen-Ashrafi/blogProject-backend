@@ -59,7 +59,7 @@ class Application {
   }
   errorHandling() {
     this.#app.use((req, res, next) => {
-      next(createError.NotFound("آدرس مورد نظر یافت نشد"));
+      next(createError.NotFound("The requested address was not found"));
     });
     this.#app.use((error, req, res, next) => {
       const serverError = createError.InternalServerError();

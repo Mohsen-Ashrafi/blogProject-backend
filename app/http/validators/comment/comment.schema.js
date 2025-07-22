@@ -7,7 +7,7 @@ const contentSchema = Joi.object().keys({
     .min(10)
     .max(2000)
     .required()
-    .error(createHttpError.BadRequest("متن نظر را به درستی وارد کنید")),
+    .error(createHttpError.BadRequest("Enter the comment text correctly")),
 });
 
 const addNewCommentSchema = Joi.object({
@@ -15,7 +15,7 @@ const addNewCommentSchema = Joi.object({
   postId: Joi.string()
     .allow()
     .pattern(MongoIDPattern)
-    .error(createHttpError.BadRequest("شناسه پست را به درستی وارد کنید")),
+    .error(createHttpError.BadRequest("Enter the post ID correctly")),
 });
 
 module.exports = {

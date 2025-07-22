@@ -13,7 +13,7 @@ class CategoryController extends Controller {
     const query = req.query;
     const categories = await CategoryModel.find(query);
     if (!categories)
-      throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");
+      throw createHttpError.ServiceUnavailable("Categories not found");
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -33,11 +33,11 @@ class CategoryController extends Controller {
       slug: slugify(englishTitle),
     });
 
-    if (!category) throw createHttpError.InternalServerError("خطای داخلی");
+    if (!category) throw createHttpError.InternalServerError("Internal error");
     return res.status(HttpStatus.CREATED).json({
       statusCode: HttpStatus.CREATED,
       data: {
-        message: "دسته بندی با موفقیت افزوده شد",
+        message: "Category added successfully",
       },
     });
   }
@@ -53,11 +53,11 @@ class CategoryController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      throw createError.InternalServerError("به روزرسانی انجام نشد");
+      throw createError.InternalServerError("Update failed");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "به روز رسانی با موفقیت انجام شد",
+        message: "Update completed successfully",
       },
     });
   }
@@ -66,23 +66,23 @@ class CategoryController extends Controller {
     await this.checkExistCategory(id);
     const deleteResult = await CategoryModel.findByIdAndDelete(id);
     if (deleteResult.deletedCount == 0)
-      throw createError.InternalServerError("حدف دسته بندی انجام نشد");
+      throw createError.InternalServerError("Category deletion failed");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "حذف دسته بندی با موفقیت انجام شد",
+        message: "Category deleted successfully",
       },
     });
   }
   async findCategoryWithTitle(englishTitle) {
     const category = await CategoryModel.findOne({ englishTitle });
     if (category)
-      throw createHttpError.BadRequest("دسته بندی با این عنوان وجود دارد.");
+      throw createHttpError.BadRequest("There is a category with this title.");
   }
   async checkExistCategory(id) {
     const category = await CategoryModel.findById(id);
     if (!category)
-      throw createHttpError.BadRequest("دسته بندی با این عنوان وجود ندارد.");
+      throw createHttpError.BadRequest("There is no category with this title.");
     return category;
   }
 }

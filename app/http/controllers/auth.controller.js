@@ -25,7 +25,7 @@ class UserAuthController extends Controller {
     // checking if the user is already in the data base :
     const existedUser = await this.checkUserExist(email);
     if (existedUser)
-      throw createError.BadRequest("کاربری با این ایمیل وجود دارد");
+      throw createError.BadRequest("There is a user with this email");
 
     // HASH PASSWORD :
     const salt = await bcrypt.genSaltSync(10);
@@ -40,7 +40,7 @@ class UserAuthController extends Controller {
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
 
-    let WELLCOME_MESSAGE = `ثبت نام با موفقیت انجام شد`;
+    let WELLCOME_MESSAGE = `Registration completed successfully`;
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -58,16 +58,16 @@ class UserAuthController extends Controller {
     const user = await this.checkUserExist(email.toLowerCase());
     if (!user)
       // throw createError.BadRequest("ایمیل یا رمز عبور اشتباه است");
-      throw createError.BadRequest("کاربری با این ایمیل وجود ندارد");
+      throw createError.BadRequest("There is no user with this email");
 
     // PASSWORD IS CORRECT :
     const validPass = await bcrypt.compare(password, user.password);
     if (!validPass)
-      throw createError.BadRequest("ایمیل یا رمز عبور اشتباه است");
+      throw createError.BadRequest("Email or password is incorrect");
 
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
-    let WELLCOME_MESSAGE = `ورود با موفقیت انجام شد`;
+    let WELLCOME_MESSAGE = `Login successful`;
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -89,12 +89,12 @@ class UserAuthController extends Controller {
       }
     );
     if (!updateResult.modifiedCount === 0)
-      throw createError.BadRequest("اطلاعات ویرایش نشد");
+      throw createError.BadRequest("Information could not be edited");
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "اطلاعات با موفقیت آپدیت شد",
+        message: "Information updated successfully",
       },
     });
   }
@@ -111,11 +111,11 @@ class UserAuthController extends Controller {
       }
     );
     if (!updateResult.modifiedCount === 0)
-      throw createError.BadRequest("عکس پروفایل آپلود نشد");
+      throw createError.BadRequest("Profile photo failed to upload");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "عکس پروفایل با موفقیت آپلود شد",
+        message: "Profile photo uploaded successfully",
       },
     });
   }

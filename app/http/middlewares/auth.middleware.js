@@ -7,20 +7,20 @@ async function isAuthWithCookie(req, res, next) {
   try {
     const userToken = req.signedCookies["userToken"];
     if (!userToken) {
-      throw createHttpError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
+      throw createHttpError.Unauthorized("Please log in to your account.");
     }
     const token = cookieParser.signedCookie(
       userToken,
       process.env.COOKIE_PARSER_SECRET_KEY
     );
     JWT.verify(token, process.env.TOKEN_SECRET_KEY, async (err, payload) => {
-      if (err) throw createHttpError.Unauthorized("توکن نامعتبر است");
+      if (err) throw createHttpError.Unauthorized("Invalid token.");
       const { _id } = payload;
       const user = await UserModel.findById(_id, {
         password: 0,
         resetLink: 0,
       });
-      if (!user) throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+      if (!user) throw createHttpError.Unauthorized("User account not found.");
       req.user = user;
       return next();
     });
@@ -33,7 +33,7 @@ async function verifyAccessToken(req, res, next) {
   try {
     const accessToken = req.signedCookies["accessToken"];
     if (!accessToken) {
-      throw createHttpError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
+      throw createHttpError.Unauthorized("Please log in to your account.");
     }
     const token = cookieParser.signedCookie(
       accessToken,
@@ -44,13 +44,14 @@ async function verifyAccessToken(req, res, next) {
       process.env.ACCESS_TOKEN_SECRET_KEY,
       async (err, payload) => {
         try {
-          if (err) throw createHttpError.Unauthorized("توکن نامعتبر است");
+          if (err) throw createHttpError.Unauthorized("Invalid token.");
           const { _id } = payload;
           const user = await UserModel.findById(_id, {
             password: 0,
             otp: 0,
           });
-          if (!user) throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+          if (!user)
+            throw createHttpError.Unauthorized("User account not found.");
           req.user = user;
           return next();
         } catch (error) {
@@ -67,7 +68,9 @@ async function verifyRecaptcha(req, res, next) {
   try {
     const recaptchaToken = req.body.recaptchaToken;
     if (!recaptchaToken)
-      throw createHttpError.Unauthorized("تیک گزینه «من ربات نیستم» را بزنید");
+      throw createHttpError.Unauthorized(
+        'Please check the "I am not a robot" checkbox.'
+      );
 
     const googleVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
     const { data } = await axios.post(googleVerifyUrl);
@@ -75,7 +78,7 @@ async function verifyRecaptcha(req, res, next) {
     if (success) {
       next();
     } else {
-      throw createHttpError.Forbidden("توکن نامعتبر است");
+      throw createHttpError.Forbidden("Invalid recaptcha token.");
     }
   } catch (error) {
     next(error);

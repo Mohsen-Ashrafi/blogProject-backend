@@ -7,15 +7,17 @@ async function validateSignupSchema(data) {
       .required()
       .min(5)
       .max(50)
-      .error(createHttpError.BadRequest("نام کاربری وارد شده صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("The username entered is not correct")),
     email: Joi.string()
       .required()
       .email()
-      .error(createHttpError.BadRequest("ایمیل وارد شده صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("The email entered is not valid")),
     password: Joi.string()
       .min(8)
       .required()
-      .error(createHttpError.BadRequest("رمز عبور باید حداقل 8 کاراکتر باشد")),
+      .error(
+        createHttpError.BadRequest("Password must be at least 8 characters")
+      ),
   });
   return await signupSchema.validateAsync(data);
 }
@@ -24,11 +26,13 @@ async function validateSigninSchema(data) {
     email: Joi.string()
       .required()
       .email()
-      .error(createHttpError.BadRequest("ایمیل وارد شده صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("The email entered is not valid")),
     password: Joi.string()
       .min(8)
       .required()
-      .error(createHttpError.BadRequest("رمز عبور باید حداقل 8 کاراکتر باشد")),
+      .error(
+        createHttpError.BadRequest("Password must be at least 8 characters")
+      ),
   });
   return await signupSchema.validateAsync(data);
 }
@@ -39,15 +43,17 @@ async function validateUpdateProfileSchema(data) {
       .min(5)
       .max(50)
       .required()
-      .error(createHttpError.BadRequest("نام کاربری وارد شده صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("The username entered is not correct")),
     email: Joi.string()
       .required()
       .email()
-      .error(createHttpError.BadRequest("ایمیل وارد شده صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("The email entered is not valid")),
     biography: Joi.string()
       .max(30)
       .allow("")
-      .error(createHttpError.BadRequest("حوزه تخصصی صحیح نمی باشد.")),
+      .error(
+        createHttpError.BadRequest("The field of expertise is not correct.")
+      ),
   });
   return updateProfileSchema.validateAsync(data);
 }

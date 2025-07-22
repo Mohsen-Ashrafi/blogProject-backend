@@ -25,7 +25,9 @@ class CommentController extends Controller {
     if (parentId && mongoose.isValidObjectId(parentId)) {
       const parentComment = await this.findCommentById(parentId);
       if (parentComment && !parentComment?.openToComment)
-        throw createHttpError.BadRequest("ثبت پاسخ برای این کامنت مجاز نیست");
+        throw createHttpError.BadRequest(
+          "Posting a reply to this comment is not allowed"
+        );
 
       const createAnswerResult = await CommentModel.updateOne(
         { _id: parentId },
@@ -42,12 +44,15 @@ class CommentController extends Controller {
         }
       );
       if (!createAnswerResult.matchedCount && !createAnswerResult.modifiedCount)
-        throw createHttpError.InternalServerError("ثبت پاسخ انجام نشد");
+        throw createHttpError.InternalServerError(
+          "Response registration failed"
+        );
 
       return res.status(HttpStatus.CREATED).json({
         statusCode: HttpStatus.CREATED,
         data: {
-          message: "پاسخ شما با موفقیت ثبت شد، پس از تایید قابل مشاهده است",
+          message:
+            "Your response was successfully submitted, it will be visible after confirmation",
         },
       });
     } else {
@@ -59,11 +64,14 @@ class CommentController extends Controller {
         openToComment: true,
       });
       if (!newComment)
-        throw createHttpError.InternalServerError("ثبت نطر انجام نشد");
+        throw createHttpError.InternalServerError(
+          "Comment registration failed"
+        );
       return res.status(HttpStatus.CREATED).json({
         statusCode: HttpStatus.CREATED,
         data: {
-          message: "نظر شما با موفقیت ثبت شد، پس از تایید قابل مشاهده است",
+          message:
+            "Your comment was successfully submitted, it will be visible after approval",
         },
       });
     }
@@ -82,11 +90,11 @@ class CommentController extends Controller {
         }
       );
       if (updateResult.modifiedCount == 0)
-        throw new createHttpError.InternalServerError("آپدیت کامنت انجام نشد");
+        throw new createHttpError.InternalServerError("Comment update failed");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "کامنت با موفقیت آپدیت شد",
+          message: "Comment updated successfully",
         },
       });
     } else {
@@ -99,11 +107,11 @@ class CommentController extends Controller {
         }
       );
       if (updateResult.modifiedCount == 0)
-        throw new createHttpError.InternalServerError("آپدیت کامنت انجام نشد");
+        throw new createHttpError.InternalServerError("Comment update failed");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "کامنت با موفقیت آپدیت شد",
+          message: "Comment updated successfully",
         },
       });
     }
@@ -114,11 +122,11 @@ class CommentController extends Controller {
     if (comment && comment.openToComment) {
       const commentToDelete = await CommentModel.findOneAndDelete({ _id: id });
       if (!commentToDelete)
-        throw new createHttpError.InternalServerError("کامنت حذف نشد");
+        throw new createHttpError.InternalServerError("Comment not deleted");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "کامنت با موفقیت حذف شد",
+          message: "Comment successfully deleted",
         },
       });
     } else {
@@ -129,11 +137,11 @@ class CommentController extends Controller {
         }
       );
       if (updateResult.modifiedCount === 0)
-        throw new createHttpError.InternalServerError("کامنت حذف نشد");
+        throw new createHttpError.InternalServerError("Comment not deleted");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "کامنت با موفقیت حذف شد",
+          message: "Comment successfully deleted",
         },
       });
     }
@@ -226,7 +234,7 @@ class CommentController extends Controller {
     ]);
     const comment = copyObject(commentFindResult);
     if (!comment?.[0])
-      throw createHttpError.NotFound("کامنتی با این مشخصات یافت نشد");
+      throw createHttpError.NotFound("No comments with these specifications were found");
     return comment?.[0];
   }
   async findAcceptedComments(id, status = 2) {

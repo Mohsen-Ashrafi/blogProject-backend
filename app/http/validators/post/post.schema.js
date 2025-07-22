@@ -8,36 +8,36 @@ async function validateAddNewPost(data) {
       .min(5)
       .max(100)
       .required()
-      .error(createHttpError.BadRequest("عنوان پست را به درستی وارد کنید")),
+      .error(createHttpError.BadRequest("Enter the post title correctly")),
     slug: Joi.string()
       .required()
-      .error(createHttpError.BadRequest(" اسلاگ پست را به درستی وارد کنید")),
+      .error(createHttpError.BadRequest("Enter the post slug correctly")),
     category: Joi.string()
       .required()
       .pattern(MongoIDPattern)
-      .error(
-        createHttpError.BadRequest(" شناسه دسته بندی را به درستی وارد کنید")
-      ),
+      .error(createHttpError.BadRequest("Enter the category ID correctly")),
     text: Joi.string()
       .required()
-      .error(createHttpError.BadRequest(" متن پست را به درستی وارد کنید")),
+      .error(createHttpError.BadRequest("Enter the post text correctly")),
     briefText: Joi.string()
       .required()
-      .error(createHttpError.BadRequest(" خلاصه پست را به درستی وارد کنید")),
+      .error(createHttpError.BadRequest("Enter the post summary correctly")),
     readingTime: Joi.number()
       .required()
       .error(
-        createHttpError.BadRequest("زمان مطالعه پست را به درستی وارد کنید")
+        createHttpError.BadRequest(
+          "Enter the correct reading time for the post"
+        )
       ),
     type: Joi.string()
       .regex(/(free|premium)/i)
-      .error(createHttpError.BadRequest("نوع پست صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("Post type is not valid")),
     related: Joi.array()
       .items(Joi.string().pattern(MongoIDPattern))
-      .error(createHttpError.BadRequest(" پست های مرتبط صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("Related posts are not correct")),
     tags: Joi.array()
       .items(Joi.string())
-      .error(createHttpError.BadRequest("تگ های پست صحیح نمی باشد")),
+      .error(createHttpError.BadRequest("Post tags are incorrect")),
   });
   return addNewPostSchema.validateAsync(data);
 }

@@ -49,7 +49,7 @@ function fileFilter(req, file, cb) {
   if (mimetypes.includes(ext)) {
     return cb(null, true);
   }
-  return cb(createError.BadRequest("فرمت ارسال شده تصویر صحیح نمیباشد"));
+  return cb(createError.BadRequest("The image format sent is not correct"));
 }
 
 function videoFilter(req, file, cb) {
@@ -58,7 +58,7 @@ function videoFilter(req, file, cb) {
   if (mimetypes.includes(ext)) {
     return cb(null, true);
   }
-  return cb(createError.BadRequest("فرمت ارسال شده ویدیو صحیح نمیباشد"));
+  return cb(createError.BadRequest("The video format sent is not correct"));
 }
 
 function videoOrAudioFilter(req, file, cb) {
@@ -82,13 +82,13 @@ function videoOrAudioFilter(req, file, cb) {
     req.body.fileType = file.mimetype.includes("audio") ? "audio" : "video";
     return cb(null, true);
   }
-  return cb(createError.BadRequest("فرمت ارسال شده ویدیو صحیح نمیباشد"));
+  return cb(createError.BadRequest("The video format sent is not correct"));
 }
 function audioFilter(req, file, cb) {
   const ext = path.extname(file.originalname);
   const mimetypes = [".mp3", ".ogg", ".m4a"];
   if (mimetypes.includes(ext)) return cb(null, true);
-  return cb(createError.BadRequest("فرمت ارسال شده وویس صحیح نمیباشد"));
+  return cb(createError.BadRequest("The sent voice message format is not correct"));
 }
 
 const avatarMaxSize = 2 * 1000 * 1000; //1MB

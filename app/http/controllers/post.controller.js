@@ -106,7 +106,7 @@ class PostController extends Controller {
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "پست های مدنظر شما",
+        message: "Here are your requested posts",
         posts: transformedPosts,
         totalPages,
       },
@@ -147,7 +147,8 @@ class PostController extends Controller {
       },
     ]);
 
-    if (!post) throw createHttpError.NotFound("پستی با این مشخصات یافت نشد");
+    if (!post)
+      throw createHttpError.NotFound("No post found with these details");
     const { id: postId } = post;
     const acceptedCommnets = await CommentController.findAcceptedComments(
       postId
@@ -188,7 +189,7 @@ class PostController extends Controller {
     // const { fileUploadPath, filename } = req.body;
 
     if (!fileUploadPath || !filename)
-      throw createHttpError.InternalServerError("کاور پست را اپلود کنید");
+      throw createHttpError.InternalServerError("Please upload a post cover");
     const fileAddress = path.join(fileUploadPath, filename);
     const coverImage = fileAddress.replace(/\\/g, "/");
 
@@ -206,12 +207,13 @@ class PostController extends Controller {
       coverImage,
     });
 
-    if (!post?._id) throw createHttpError.InternalServerError("پست ثبت نشد");
+    if (!post?._id)
+      throw createHttpError.InternalServerError("Post creation failed");
 
     return res.status(HttpStatus.CREATED).json({
       statusCode: HttpStatus.CREATED,
       data: {
-        message: "پست با موفقیت ایجاد شد",
+        message: "Post created successfully",
         post,
       },
     });
@@ -240,14 +242,12 @@ class PostController extends Controller {
     );
 
     if (!updatePostResult.modifiedCount)
-      throw new createHttpError.InternalServerError(
-        "به روزرسانی پست انجام نشد"
-      );
+      throw new createHttpError.InternalServerError("Post update failed");
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "به روزرسانی پست با موفقیت انجام شد",
+        message: "Post updated successfully",
       },
     });
   }
@@ -255,11 +255,12 @@ class PostController extends Controller {
     const { id } = req.params;
     await this.findPostById(id);
     const post = await PostModel.findByIdAndDelete(id);
-    if (!post._id) throw createHttpError.InternalServerError(" پست حذف نشد");
+    if (!post._id)
+      throw createHttpError.InternalServerError("Post deletion failed");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
-        message: "پست با موفقیت حذف شد",
+        message: "Post deleted successfully",
       },
     });
   }
@@ -271,10 +272,10 @@ class PostController extends Controller {
   }
   async findPostById(id) {
     if (!mongoose.isValidObjectId(id))
-      throw createHttpError.BadRequest("شناسه پست نامعتبر است");
+      throw createHttpError.BadRequest("Invalid post ID");
 
     const post = await PostModel.findById(id);
-    if (!post) throw createHttpError.BadRequest("پست با این مشخصات یافت نشد");
+    if (!post) throw createHttpError.BadRequest("No post found with this ID");
     return copyObject(post);
   }
   async likePost(req, res) {
@@ -303,12 +304,12 @@ class PostController extends Controller {
     );
 
     if (postUpdate.modifiedCount === 0 || userUpdate.modifiedCount === 0)
-      throw createHttpError.BadRequest("عملیات ناموفق بود.");
+      throw createHttpError.BadRequest("Operation failed");
 
     let message;
     if (!likedPost) {
-      message = "مرسی بابت لایک تون";
-    } else message = "لایک شما برداشته شد";
+      message = "Thanks for the like!";
+    } else message = "Your like has been removed";
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -343,12 +344,12 @@ class PostController extends Controller {
     );
 
     if (postUpdate.modifiedCount === 0 || userUpdate.modifiedCount === 0)
-      throw createHttpError.BadRequest("عملیات ناموفق بود.");
+      throw createHttpError.BadRequest("Operation failed");
 
     let message;
     if (!likedPost) {
-      message = "پست بوکمارک شد";
-    } else message = "پست از بوکمارک برداشته شد";
+      message = "Post bookmarked";
+    } else message = "Post removed from bookmarks";
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,

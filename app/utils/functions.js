@@ -27,7 +27,7 @@ function checkEmail(email) {
 }
 
 function toPersianDigits(n) {
-  const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  const farsiDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
   return n.toString().replace(/\d/g, (x) => farsiDigits[parseInt(x)]);
 }
 
@@ -46,7 +46,7 @@ function generateToken(user, expiresIn, secret) {
       secret || process.env.TOKEN_SECRET_KEY,
       options,
       (err, token) => {
-        if (err) reject(createError.InternalServerError("خطای سروری"));
+        if (err) reject(createError.InternalServerError("Server error"));
         resolve(token);
       }
     );
@@ -88,7 +88,7 @@ async function setRefreshToken(res, user) {
 function VerifyRefreshToken(req) {
   const refreshToken = req.signedCookies["refreshToken"];
   if (!refreshToken) {
-    throw createError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
+    throw createError.Unauthorized("Please log in to your account.");
   }
   const token = cookieParser.signedCookie(
     refreshToken,
@@ -101,17 +101,17 @@ function VerifyRefreshToken(req) {
       async (err, payload) => {
         try {
           if (err)
-            reject(createError.Unauthorized("لطفا حساب کاربری خود شوید"));
+            reject(createError.Unauthorized("Please log in to your account."));
           const { _id } = payload;
           const user = await UserModel.findById(_id, {
             password: 0,
             otp: 0,
             resetLink: 0,
           });
-          if (!user) reject(createError.Unauthorized("حساب کاربری یافت نشد"));
+          if (!user) reject(createError.Unauthorized("User account not found"));
           return resolve(_id);
         } catch (error) {
-          reject(createError.Unauthorized("حساب کاربری یافت نشد"));
+          reject(createError.Unauthorized("User account not found"));
         }
       }
     );
@@ -121,9 +121,9 @@ function VerifyRefreshToken(req) {
 async function checkPostExist(id) {
   const { PostModel } = require("../models/post");
   if (!mongoose.isValidObjectId(id))
-    throw createError.BadRequest("شناسه پست ارسال شده صحیح نمیباشد");
+    throw createError.BadRequest("Post ID is not valid.");
   const post = await PostModel.findById(id);
-  if (!post) throw createError.NotFound("پستی یافت نشد");
+  if (!post) throw createError.NotFound("Post not found.");
   return post;
 }
 function calculateDateDuration(endTime) {
@@ -132,17 +132,17 @@ function calculateDateDuration(endTime) {
     end: new Date(endTime),
   });
 
-  if (years) return `${toPersianNumbers(years)} سال پیش`;
-  if (months) return `${toPersianNumbers(months)} ماه پیش`;
+  if (years) return `${toPersianNumbers(years)} years ago`;
+  if (months) return `${toPersianNumbers(months)} months ago`;
   if (days && days > 7)
-    return `${toPersianNumbers((days / 7).toFixed(0))} هفته پیش`;
-  if (days) return `${toPersianNumbers(days)} روز پیش`;
-  if (hours) return `${toPersianNumbers(hours)} ساعت پیش`;
-  if (minutes) return `${toPersianNumbers(minutes)} دقیقه پیش`;
-  if (seconds) return `${toPersianNumbers(seconds)} ثانیه پیش`;
+    return `${toPersianNumbers((days / 7).toFixed(0))} weeks ago`;
+  if (days) return `${toPersianNumbers(days)} days ago`;
+  if (hours) return `${toPersianNumbers(hours)} hours ago`;
+  if (minutes) return `${toPersianNumbers(minutes)} minutes ago`;
+  if (seconds) return `${toPersianNumbers(seconds)} seconds ago`;
 }
 
-const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+const farsiDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 function toPersianNumbers(n) {
   return n.toString().replace(/\d/g, (x) => farsiDigits[parseInt(x)]);
 }
