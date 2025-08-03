@@ -55,7 +55,12 @@ class Application {
     this.#app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY));
   }
   configRoutes() {
-    // ✅ Route root for test
+    // Health check route for Render
+    this.#app.get("/api/health", (req, res) => {
+      res.status(200).send("✅ OK");
+    });
+
+    // Root route for test
     this.#app.get("/", (req, res) => {
       res.send("✅ Backend is running!");
     });
